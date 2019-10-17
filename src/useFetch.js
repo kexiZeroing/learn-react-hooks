@@ -25,7 +25,7 @@ export const useFetch = url => {
                 //     if (isLive.current) {
                 //       setState({ data: data.title, loading: false });
                 //     }
-                // }, 2000);
+                // }, 1000);
             });
     }, [url]);
 
