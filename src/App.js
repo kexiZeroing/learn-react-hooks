@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useLayoutEffect, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useLayoutEffect, useCallback, useMemo } from 'react';
 import { useForm } from "./useForm";
 import { Hello } from './Hello';
 import { useFetch } from "./useFetch";
@@ -76,6 +76,31 @@ const App = () => {
       setCnt2(c => c + n);
     }, [setCnt2]);
 
+
+  const postData = useFetch("https://jsonplaceholder.typicode.com/posts/1");
+  const data2 = postData.data;
+
+  // By default, it will get called in every render
+  const computeLongestWord = (sentence) => {
+    if(!sentence) return "";
+    
+    console.log('computing longest word get called');
+    let longestWord = "";
+    sentence.split(" ").forEach(word => {
+      if(word.length > longestWord.length) {
+        longestWord = word;
+      }
+    });
+
+    return longestWord;
+  }
+
+  // useMemo returns a memoized value. Only recompute the memoized value when one of the dependencies has changed. Remember that the function passed to useMemo runs during rendering. 
+  // useMemo does nothing when called with only one argument (function). Did you forget to pass an array of dependencies?  
+  // useCallback(fn, deps) is equivalent to useMemo(() => fn, deps)
+  const longestWord = useMemo(() => computeLongestWord(data2), [data2]);
+ 
+  
   return (
     <div>
       <button onClick={() => setCount(count + 1)}>+</button>
@@ -151,6 +176,8 @@ const App = () => {
         return <Increment key={n} increment={increment2} num={n} />;
       })}
       <div>cnt2: {cnt2}</div>
+
+      <div>{longestWord}</div>
     </div>
   )
 }
