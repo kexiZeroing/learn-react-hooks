@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useForm } from "./useForm";
 import { Hello } from './Hello';
 import { useFetch } from "./useFetch";
@@ -38,7 +38,9 @@ const App = () => {
 
   // add listener once, and remove listener in the return function
   useEffect(() => {    
-    const onMouseMove = e => console.log({x: e.x, y: e.y});
+    const onMouseMove = e => {
+      // console.log({x: e.x, y: e.y});
+    }
     
     window.addEventListener('mousemove', onMouseMove);
 
@@ -49,6 +51,10 @@ const App = () => {
   const [idx, setIdx] = useState(1);
   const {data, loading} = useFetch(`https://jsonplaceholder.typicode.com/todos/${idx}`);
 
+  // pass to any component to refer it
+  const inputRef = useRef();
+  const hiRef = useRef(() => console.log("hi"));
+
   return (
     <div>
       <button onClick={() => setCount(count + 1)}>+</button>
@@ -58,16 +64,17 @@ const App = () => {
       <div>{count2}</div>
 
       <button onClick={() => setNum(cur => ({
-            ...cur, 
-            num1: cur.num1 + 1
-          }))
-        }>
-          +
+          ...cur, 
+          num1: cur.num1 + 1
+        }))
+      }>
+        +
       </button>
       <div>{num1}</div>
       <div>{num2}</div>
 
       <input 
+        ref={inputRef}
         name="username" 
         placeholder="username" 
         value={username} 
@@ -80,6 +87,13 @@ const App = () => {
         value={password} 
         onChange={e => setPassword(e.target.value)}
       />
+      <button onClick={() => {
+          // console.log(inputRef.current);
+          inputRef.current.focus();
+          hiRef.current();
+      }}>
+          focus username
+      </button>
       <br />
 
       <input 
@@ -101,6 +115,8 @@ const App = () => {
 
       <div>{loading ? 'loading...' : data}</div>
       <button onClick={() => setIdx(id => id + 1)}>change URL</button>
+      <br />  
+
     </div>
   )
 }
