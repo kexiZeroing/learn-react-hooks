@@ -1,7 +1,6 @@
 import React from "react";
 
 export const Hello = () => {
-    // componentWillUnmount
     React.useEffect(() => {
         console.log("render");
         

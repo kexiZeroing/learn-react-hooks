@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useForm } from "./useForm";
 import { Hello } from './Hello';
+import { useFetch } from "./useFetch";
 
+// not call every render
 function expensiveInitialState() {
   return 10;
 }
@@ -18,6 +20,7 @@ const App = () => {
    
   const [showHello, setShowHello] = useState(true);
 
+  // multipe useEffect fire orderly
   // componentDidMount
   useEffect(() => {
     console.log("componentDidMount");
@@ -27,6 +30,24 @@ const App = () => {
   useEffect(() => {
     console.log("after render");
   }, [values.firstName, count]);
+
+  // clean-up work when old value changes
+  useEffect(() => {    
+    return () => console.log("clean-up");
+  }, [count2]);
+
+  // add listener once, and remove listener in the return function
+  useEffect(() => {    
+    const onMouseMove = e => console.log({x: e.x, y: e.y});
+    
+    window.addEventListener('mousemove', onMouseMove);
+
+    return () => window.removeEventListener('mousemove', onMouseMove);
+  }, [])
+
+  // fetch data
+  const [idx, setIdx] = useState(1);
+  const {data, loading} = useFetch(`https://jsonplaceholder.typicode.com/todos/${idx}`);
 
   return (
     <div>
@@ -77,6 +98,9 @@ const App = () => {
 
       <button onClick={() => setShowHello(!showHello)}>toggle</button>
       {showHello && <Hello />}
+
+      <div>{loading ? 'loading...' : data}</div>
+      <button onClick={() => setIdx(id => id + 1)}>change URL</button>
     </div>
   )
 }
