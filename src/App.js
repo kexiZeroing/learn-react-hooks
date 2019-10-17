@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useForm } from "./useForm";
+import { Hello } from './Hello';
 
 function expensiveInitialState() {
   return 10;
@@ -14,6 +15,18 @@ const App = () => {
   const [password, setPassword] = useState("");
 
   const [values, handleChange] = useForm({ firstName: "", lastName: "" });
+   
+  const [showHello, setShowHello] = useState(true);
+
+  // componentDidMount
+  useEffect(() => {
+    console.log("componentDidMount");
+  }, []);
+
+  // dependency array
+  useEffect(() => {
+    console.log("after render");
+  }, [values.firstName, count]);
 
   return (
     <div>
@@ -50,14 +63,20 @@ const App = () => {
 
       <input 
         name="firstName" 
+        placeholder="firstName" 
         value={values.firstName} 
         onChange={handleChange} 
       />
       <input
         name="lastName"
+        placeholder="lastName" 
         value={values.lastName}
         onChange={handleChange}
       />
+      <br />
+
+      <button onClick={() => setShowHello(!showHello)}>toggle</button>
+      {showHello && <Hello />}
     </div>
   )
 }
