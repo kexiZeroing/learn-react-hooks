@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useLayoutEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useRef, useLayoutEffect, useCallback, useMemo, useReducer } from 'react';
 import { useForm } from "./useForm";
 import { Hello } from './Hello';
 import { useFetch } from "./useFetch";
@@ -8,6 +8,38 @@ import { Increment } from "./Increment";
 // not call every render
 function expensiveInitialState() {
   return 10;
+}
+
+// return the new state based on different action, (state, action) -> state
+// create new state (immutable)
+function reducer(state, action) {
+  switch(action.type) {
+    case "INC":
+      return state + 1;
+    case "DEC":
+      return state - 1;
+    default:
+      return state;
+  }
+}
+
+function reducer2(state, action) {
+  switch (action.type) {
+    case "add-todo":
+      return {
+        todos: [...state.todos, { text: action.text, completed: false }],
+        todoCount: state.todoCount + 1
+      };
+    case "toggle-todo":  
+      return {
+        todos: state.todos.map((t, idx) =>
+          idx === action.idx ? { ...t, completed: !t.completed } : t
+        ),
+        todoCount: state.todoCount
+      };
+    default:
+      return state;
+  }
 }
 
 const App = () => {
@@ -100,7 +132,14 @@ const App = () => {
   // useCallback(fn, deps) is equivalent to useMemo(() => fn, deps)
   const longestWord = useMemo(() => computeLongestWord(data2), [data2]);
  
-  
+  // similar to redux, pass in the reducer fucntion and initial value
+  // An alternative to useState. Accepts a reducer of type (state, action) => newState, and returns the current state paired with a dispatch method. useReducer is usually preferable to useState when you have complex state logic that involves multiple sub-values.
+  const [cnt3, dispatch] = useReducer(reducer, 0);
+
+  // todos example using reducer
+  const [{ todos, todoCount }, dispatch2] = useReducer(reducer2, {todos: [], todoCount: 0});
+  const [text, setText] = useState("");
+
   return (
     <div>
       <button onClick={() => setCount(count + 1)}>+</button>
@@ -178,6 +217,32 @@ const App = () => {
       <div>cnt2: {cnt2}</div>
 
       <div>{longestWord}</div>
+
+      <div>cnt3: {cnt3}</div>
+      <button onClick={() => dispatch({type: "INC"})}>+</button>
+      <button onClick={() => dispatch({type: "DEC"})}>-</button>
+      <br />
+
+      <form
+        onSubmit={e => {
+          e.preventDefault();
+          dispatch2({type: "add-todo", text});
+          setText("");
+        }}
+      >
+        <input value={text} onChange={e => setText(e.target.value)} />
+      </form>
+      <div># of todos: {todoCount}</div>
+      {todos.map((t, idx) => (
+        <div
+          key={t.text}
+          onClick={() => dispatch2({ type: "toggle-todo", idx })}
+          style={{textDecoration: t.completed ? "line-through" : ""}}
+        >
+          {t.text}
+        </div>
+      ))}
+
     </div>
   )
 }
