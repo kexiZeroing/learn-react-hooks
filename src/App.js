@@ -4,6 +4,10 @@ import { Hello } from './Hello';
 import { useFetch } from "./useFetch";
 import { Hello2 } from './Hello2';
 import { Increment } from "./Increment";
+import { BrowserRouter as Router, Route, Link } from "react-router-dom";
+import { Login } from "./Login";
+import { About } from "./About";
+import { UserContext } from "./UserContext";
 
 // not call every render
 function expensiveInitialState() {
@@ -140,6 +144,10 @@ const App = () => {
   const [{ todos, todoCount }, dispatch2] = useReducer(reducer2, {todos: [], todoCount: 0});
   const [text, setText] = useState("");
 
+  const [user, setUser] = useState(null);
+  const userVal = useMemo(() => ({ user, setUser }), [user, setUser]);
+
+
   return (
     <div>
       <button onClick={() => setCount(count + 1)}>+</button>
@@ -242,6 +250,17 @@ const App = () => {
           {t.text}
         </div>
       ))}
+
+      <Router>
+        <nav>
+          <div><Link to="/">Login</Link></div>
+          <div><Link to="/about">About</Link></div>
+        </nav>
+        <UserContext.Provider value={userVal}>
+          <Route path="/" exact component={Login} />
+          <Route path="/about" component={About} />
+        </UserContext.Provider>
+      </Router>
 
     </div>
   )
